@@ -5,24 +5,19 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.event.*;
 
-class Janela extends JPanel implements MouseMotionListener {
+class Janela extends JPanel {
     private static final long serialVersionUID = 1L;
-    private static int coordX = 122;
-    private static int coordY = 100;
+    private int coordX = 122;
+    private int coordY = 100;
     Image imgBackGround;
     Image imgBluePaddle;
     Image imgRedPaddle;
     Image imgPuck;
 
-    public void mouseMoved(MouseEvent e) {
-        System.out.println("Mouse entered: X:" + e.getX() + "Y: " + e.getY());
-        coordX = e.getX();
-        coordY = e.getY();
+    public void setXY(int coordX, int coordY) {
+        this.coordX = coordX;
+        this.coordY = coordY;
         repaint();
-    }
-
-    public void mouseDragged(MouseEvent e) {
-        System.out.println("Mouse exited: X:" + e.getX() + "Y: " + e.getY());
     }
 
     Janela() {
@@ -32,7 +27,7 @@ class Janela extends JPanel implements MouseMotionListener {
             imgBluePaddle = ImageIO.read(new File("./imagens/bluepaddle.png"));
             imgRedPaddle = ImageIO.read(new File("./imagens/redpaddle.png"));
             imgPuck = ImageIO.read(new File("./imagens/puck.png"));
-            addMouseMotionListener(this);
+            // addMouseMotionListener(this);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "A imagem não pode ser carregada!\n" + e, "Erro", JOptionPane.ERROR_MESSAGE);
             System.exit(1);
