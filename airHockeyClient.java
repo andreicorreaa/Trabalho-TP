@@ -12,18 +12,24 @@ class airHockeyClient extends JFrame  implements Runnable, MouseMotionListener {
     static PrintStream os = null;
     private static int coordX = 122;
     private static int coordY = 100;
+    private boolean connex = true;
     Janela janela;
 
     public void mouseMoved(MouseEvent e) {
         System.out.println("Mouse entered: X:" + e.getX() + "Y: " + e.getY());
         coordX = e.getX();
         coordY = e.getY();
+        try {
+            os.println("X"+coordX+"Y"+coordY);
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
         janela.setXY(coordX, coordY);
         // repaint();
     }
 
     public void mouseDragged(MouseEvent e) {
-        System.out.println("Mouse exited: X:" + e.getX() + "Y: " + e.getY());
+        connex = false;
     }
 
     airHockeyClient() {
@@ -56,8 +62,8 @@ class airHockeyClient extends JFrame  implements Runnable, MouseMotionListener {
         try {
 
             do {
-                os.println("Mouse X " + coordX + "Y: " + coordY);
-            } while (coordX >= 122);
+                //os.println("Mouse X " + coordX + "Y: " + coordY);
+            } while (connex);
 
             os.close();
             is.close();
