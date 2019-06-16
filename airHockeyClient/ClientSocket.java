@@ -23,23 +23,10 @@ public class ClientSocket {
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for the connection to host");
         }
-
-        // try {
-
-        // do {
-        // // is.println("Mouse X " + coordX + "Y: " + coordY);
-        // System.out.println("Token: " + is.next());
-        // } while (isConnected);
-
-        // } catch (UnknownHostException e) {
-        // System.err.println("Trying to connect to unknown host: " + e);
-        // } catch (IOException e) {
-        // System.err.println("IOException: " + e);
-        // }
     }
 
     public String receiveMessageFromServer() {
-        return "Token: " + is.next();
+        return is.next();
     }
 
     public void sendMessageToServer(String message) {
@@ -48,6 +35,11 @@ public class ClientSocket {
         } catch (Exception ex) {
             System.out.println(ex);
         }
+    }
+
+    public String getInitialPosition() {
+        this.sendMessageToServer("I");
+        return is.next();
     }
 
     public Boolean isConnected() {

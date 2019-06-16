@@ -41,6 +41,9 @@ class Servindo extends Thread {
   Socket clientSocket;
   static PrintStream os[] = new PrintStream[3];
   static int cont=0;
+  String initCoordX = "122";
+  String initCoordY = "100";
+  Scanner is;
 
   Servindo(Socket clientSocket) {
     this.clientSocket = clientSocket;
@@ -48,7 +51,7 @@ class Servindo extends Thread {
 
   public void run() {
     try {
-      Scanner is = new Scanner(clientSocket.getInputStream());
+      this.is = new Scanner(clientSocket.getInputStream());
       os[cont++] = new PrintStream(clientSocket.getOutputStream());
       String inputLine, outputLine;
 
@@ -56,7 +59,10 @@ class Servindo extends Thread {
         inputLine = is.nextLine();
         for (int i=0; i<cont; i++) {
           System.out.println(inputLine);
-          os[i].println(i + inputLine);
+          if (inputLine.equals("I")) {
+            os[i].println(this.returnInitialCoords());
+          }
+          // os[i].println(i + inputLine);
           os[i].flush();
         }
       } while (!inputLine.equals("exit"));
@@ -71,5 +77,9 @@ class Servindo extends Thread {
     } catch (NoSuchElementException e) {
       System.out.println("Conexacao terminada pelo cliente");
     }
+  }
+
+  public String returnInitialCoords() {
+    return initCoordX+","+initCoordY;
   }
 };

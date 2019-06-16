@@ -7,7 +7,7 @@ import java.awt.event.*;
 
 class Janela extends JPanel {
     private static final long serialVersionUID = 1L;
-    private int coordX = 122;
+    private int coordX = 122+40;
     private int coordY = 100;
     Image imgBackGround;
     Image imgBluePaddle;

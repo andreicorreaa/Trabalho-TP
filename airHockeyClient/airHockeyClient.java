@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.StringTokenizer;
 
 class airHockeyClient extends JFrame implements MouseMotionListener, Runnable {
 
@@ -17,12 +18,14 @@ class airHockeyClient extends JFrame implements MouseMotionListener, Runnable {
     ClientSocket client = null;
 
     public void mouseMoved(MouseEvent e) {
-        coordX = e.getX();
-        coordY = e.getY();
+        // coordX = e.getX();
+        // coordY = e.getY();
         try {
             if (this.client.isConnected()) {
-                this.client.sendMessageToServer(serialVersionUID + "," + coordX + "," + coordY);
-                System.out.println(this.client.receiveMessageFromServer());
+                this.client.sendMessageToServer("I"); //serialVersionUID + "," + coordX + "," + coordY
+                StringTokenizer s = new StringTokenizer(this.client.receiveMessageFromServer(),",");
+                coordX = Integer.parseInt(s.nextToken());
+                coordY = Integer.parseInt(s.nextToken());
             }
         } catch (Exception ex) {
             System.out.println(ex);
