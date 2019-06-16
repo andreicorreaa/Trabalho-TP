@@ -6,7 +6,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-class airHockeyClient extends JFrame  implements Runnable, MouseMotionListener {
+class airHockeyClient extends JFrame implements MouseMotionListener, Runnable {
 
     private static final long serialVersionUID = 1L;
     static PrintStream os = null;
@@ -14,22 +14,32 @@ class airHockeyClient extends JFrame  implements Runnable, MouseMotionListener {
     private static int coordY = 100;
     private boolean connex = true;
     Janela janela;
+    ClientSocket client = null;
 
     public void mouseMoved(MouseEvent e) {
-        // System.out.println("Mouse entered: X:" + e.getX() + "Y: " + e.getY());
         coordX = e.getX();
         coordY = e.getY();
         try {
-            os.println(serialVersionUID+","+coordX+","+coordY);
+            if (this.client.isConnected()) {
+                this.client.sendMessageToServer(serialVersionUID + "," + coordX + "," + coordY);
+                System.out.println(this.client.receiveMessageFromServer());
+            }
         } catch (Exception ex) {
             System.out.println(ex);
         }
         janela.setXY(coordX, coordY);
-        // repaint();
     }
 
     public void mouseDragged(MouseEvent e) {
         connex = false;
+    }
+
+    private void initConnex() {
+        try {
+            client = new ClientSocket();
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
     }
 
     airHockeyClient() {
@@ -46,34 +56,7 @@ class airHockeyClient extends JFrame  implements Runnable, MouseMotionListener {
     }
 
     public void run() {
-        Socket socket = null;
-        Scanner is = null;
-
-        try {
-            socket = new Socket("127.0.0.1", 80);
-            os = new PrintStream(socket.getOutputStream(), true);
-            is = new Scanner(socket.getInputStream());
-        } catch (UnknownHostException e) {
-            System.err.println("Don't know about host.");
-        } catch (IOException e) {
-            System.err.println("Couldn't get I/O for the connection to host");
-        }
-
-        try {
-
-            do {
-                // is.println("Mouse X " + coordX + "Y: " + coordY);
-                System.out.println("Token: "+is.next());
-            } while (connex);
-
-            os.close();
-            is.close();
-            socket.close();
-        } catch (UnknownHostException e) {
-            System.err.println("Trying to connect to unknown host: " + e);
-        } catch (IOException e) {
-            System.err.println("IOException:  " + e);
-        }
+        initConnex();
     }
 
     static public void main(String[] args) {
