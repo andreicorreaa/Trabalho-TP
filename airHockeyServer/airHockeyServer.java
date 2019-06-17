@@ -1,6 +1,7 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.util.StringTokenizer;
 
 class airHockeyServer {
   public static void main(String[] args) {
@@ -25,7 +26,6 @@ class airHockeyServer {
       System.out.println("Accept Funcionou!");
 
       new Servindo(clientSocket).start();
-
     }
 
     try {
@@ -36,46 +36,78 @@ class airHockeyServer {
   }
 }
 
-class Servindo extends Thread {
+class Servindo implements Runnable {
   Socket clientSocket;
   static PrintStream os[] = new PrintStream[3];
   static int cont = 0;
-  String initCoordX = "122";
-  String initCoordY = "100";
   Scanner is;
+  String playerAPos = "122,100";
+  String playerBPos = "122,322";
 
   Servindo(Socket clientSocket) {
     this.clientSocket = clientSocket;
   }
 
+  public void start() {
+    Thread MainThread = new Thread(this, "mainThread");
+    MainThread.start();
+  }
+
   public void run() {
     try {
+      Thread myThread = Thread.currentThread();
       this.is = new Scanner(clientSocket.getInputStream());
       os[cont++] = new PrintStream(clientSocket.getOutputStream());
       String inputLine, outputLine;
+      inputLine = is.nextLine();
 
-      do {
-        inputLine = is.nextLine();
+      if (inputLine.matches("(.*)P(.*)")) {
+        System.out.println(myThread);
         for (int i = 0; i < cont; i++) {
-          System.out.println(inputLine);
-          os[i].println(i+","+inputLine);
+          os[i].println(i);
           os[i].flush();
         }
-      } while (!inputLine.equals("exit"));
+      }
 
-      for (int i = 0; i < cont; i++)
+      do {
+        StringTokenizer s = new StringTokenizer(is.nextLine(), ",");
+        String query = s.nextToken();
+        String opponent = s.nextToken();
+
+        if (query.matches("(.*)getOpponent(.*)")) {
+          if (opponent.matches("(.*)0(.*)")) {
+            os[1].println(playerAPos);
+          } else if (opponent.matches("(.*)1(.*)")) {
+            os[0].println(playerBPos);
+          }
+        }
+
+
+        if (query.matches("(.*)setPos(.*)")) {
+          if (opponent.matches("(.*)0(.*)")) {
+            String coordX = s.nextToken();
+            String coordY = s.nextToken();
+            playerAPos = coordX + ","+ coordY;
+            os[0].println(playerAPos);
+          } else if (opponent.matches("(.*)1(.*)")) {
+            String coordX = s.nextToken();
+            String coordY = s.nextToken();
+            playerBPos = coordX + ","+ coordY;;
+            os[1].println(playerBPos);
+          }
+        }
+      } while (cont<3);
+
+      for (int i = 0; i < cont; i++) {
         os[i].close();
-      is.close();
-      clientSocket.close();
+        is.close();
+        clientSocket.close();
+      }
 
     } catch (IOException e) {
       e.printStackTrace();
     } catch (NoSuchElementException e) {
       System.out.println("Conexacao terminada pelo cliente");
     }
-  }
-
-  public String returnInitialCoords() {
-    return initCoordX + "," + initCoordY;
   }
 };

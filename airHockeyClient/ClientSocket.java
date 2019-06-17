@@ -11,12 +11,21 @@ public class ClientSocket {
     Socket socket;
     Scanner is;
     Boolean isConnected = false;
+    int opponent;
+    // private int player;
 
     ClientSocket() {
-        this.tryConnec();
+        this.tryConnect();
+        os.println("P?");
+        // player = 0; //Integer.parseInt(is.next());
+        // System.out.println(player);
     }
 
-    public void tryConnec() {
+    // public int getPlayer() {
+    // return player;
+    // }
+
+    synchronized public void tryConnect() {
         try {
             this.socket = new Socket("127.0.0.1", 80);
             os = new PrintStream(this.socket.getOutputStream(), true);
@@ -32,15 +41,15 @@ public class ClientSocket {
         }
     }
 
-    public Socket returnSocket() {
+    synchronized public Socket returnSocket() {
         return this.socket;
     }
 
-    public String receiveMessageFromServer() {
-        return is.next();
+    synchronized public String receiveMessageFromServer() {
+        return is.nextLine();
     }
 
-    public void sendMessageToServer(String message) {
+    synchronized public void sendMessageToServer(String message) {
         try {
             os.println(message);
         } catch (Exception ex) {
@@ -48,16 +57,23 @@ public class ClientSocket {
         }
     }
 
-    public String getInitialPosition() {
-        this.sendMessageToServer("I");
-        return is.next();
-    }
-
-    public Boolean isConnected() {
+    synchronized public Boolean isConnected() {
         return socket.isConnected();
     }
 
-    public void encerrarConn() {
+    synchronized public String getOpponentXY(int opponent) {
+        this.sendMessageToServer("getOpponent," + opponent);
+        String resp = is.nextLine();
+        return resp;
+    }
+
+    synchronized public String setPos(int player, int x, int y) {
+        this.sendMessageToServer("setPos," + player + "," + x + "," + y);
+        String resp = is.nextLine();
+        return resp;
+    }
+
+    synchronized public void encerrarConn() {
         try {
             os.close();
             is.close();
