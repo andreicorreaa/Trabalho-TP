@@ -4,6 +4,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import javax.swing.JOptionPane;
 
 public class ClientSocket {
     static PrintStream os = null;
@@ -12,17 +13,27 @@ public class ClientSocket {
     Boolean isConnected = false;
 
     ClientSocket() {
+        this.tryConnec();
+    }
 
+    public void tryConnec() {
         try {
             this.socket = new Socket("127.0.0.1", 80);
             os = new PrintStream(this.socket.getOutputStream(), true);
             this.is = new Scanner(this.socket.getInputStream());
             this.isConnected = true;
         } catch (UnknownHostException e) {
-            System.err.println("Don't know about host.");
+            JOptionPane.showMessageDialog(null, "Problema de conexão com o servidor:\n" + e + socket.isConnected());
+            // System.exit(1);
         } catch (IOException e) {
-            System.err.println("Couldn't get I/O for the connection to host");
+            JOptionPane.showMessageDialog(null, "Problema de conexão com o servidor:\n" + e + socket.isConnected(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+            // System.exit(1);
         }
+    }
+
+    public Socket returnSocket() {
+        return this.socket;
     }
 
     public String receiveMessageFromServer() {
@@ -43,7 +54,7 @@ public class ClientSocket {
     }
 
     public Boolean isConnected() {
-        return isConnected;
+        return socket.isConnected();
     }
 
     public void encerrarConn() {

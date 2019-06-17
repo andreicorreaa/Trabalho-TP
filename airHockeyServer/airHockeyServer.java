@@ -4,7 +4,7 @@ import java.util.*;
 
 class airHockeyServer {
   public static void main(String[] args) {
-    ServerSocket serverSocket=null;
+    ServerSocket serverSocket = null;
 
     try {
       serverSocket = new ServerSocket(80);
@@ -13,7 +13,7 @@ class airHockeyServer {
       System.exit(1);
     }
 
-    for (int i=0; i<3; i++) {
+    for (int i = 0; i < 3; i++) {
       Socket clientSocket = null;
       try {
         clientSocket = serverSocket.accept();
@@ -36,11 +36,10 @@ class airHockeyServer {
   }
 }
 
-
 class Servindo extends Thread {
   Socket clientSocket;
   static PrintStream os[] = new PrintStream[3];
-  static int cont=0;
+  static int cont = 0;
   String initCoordX = "122";
   String initCoordY = "100";
   Scanner is;
@@ -57,17 +56,14 @@ class Servindo extends Thread {
 
       do {
         inputLine = is.nextLine();
-        for (int i=0; i<cont; i++) {
+        for (int i = 0; i < cont; i++) {
           System.out.println(inputLine);
-          if (inputLine.equals("I")) {
-            os[i].println(this.returnInitialCoords());
-          }
-          // os[i].println(i + inputLine);
+          os[i].println(i+","+inputLine);
           os[i].flush();
         }
       } while (!inputLine.equals("exit"));
 
-      for (int i=0; i<cont; i++)
+      for (int i = 0; i < cont; i++)
         os[i].close();
       is.close();
       clientSocket.close();
@@ -80,6 +76,6 @@ class Servindo extends Thread {
   }
 
   public String returnInitialCoords() {
-    return initCoordX+","+initCoordY;
+    return initCoordX + "," + initCoordY;
   }
 };

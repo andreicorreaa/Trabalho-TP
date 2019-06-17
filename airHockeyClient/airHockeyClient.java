@@ -6,6 +6,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.StringTokenizer;
+import javax.swing.JOptionPane;
+import java.awt.image.BufferedImage;
 
 class airHockeyClient extends JFrame implements MouseMotionListener, Runnable {
 
@@ -16,33 +18,27 @@ class airHockeyClient extends JFrame implements MouseMotionListener, Runnable {
     private boolean connex = true;
     Janela janela;
     ClientSocket client = null;
+    private int player;
+    
 
     public void mouseMoved(MouseEvent e) {
-        // coordX = e.getX();
-        // coordY = e.getY();
+        coordX = e.getX();
+        coordY = e.getY();
         try {
-            if (this.client.isConnected()) {
-                this.client.sendMessageToServer("I"); //serialVersionUID + "," + coordX + "," + coordY
-                StringTokenizer s = new StringTokenizer(this.client.receiveMessageFromServer(),",");
-                coordX = Integer.parseInt(s.nextToken());
-                coordY = Integer.parseInt(s.nextToken());
-            }
+            this.client.sendMessageToServer(coordX + "," + coordY); // 
+            StringTokenizer s = new StringTokenizer(this.client.receiveMessageFromServer(), ",");
+            player = Integer.parseInt(s.nextToken());
+            coordX = Integer.parseInt(s.nextToken());
+            coordY = Integer.parseInt(s.nextToken());
         } catch (Exception ex) {
-            System.out.println(ex);
+            System.out.println("mouseMoved: " + ex);
         }
-        janela.setXY(coordX, coordY);
+        System.out.println(player+","+coordX + "," + coordY);
+        janela.setXY(coordX, coordY, player);
     }
 
     public void mouseDragged(MouseEvent e) {
         connex = false;
-    }
-
-    private void initConnex() {
-        try {
-            client = new ClientSocket();
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
     }
 
     airHockeyClient() {
@@ -50,6 +46,10 @@ class airHockeyClient extends JFrame implements MouseMotionListener, Runnable {
         setLayout(new FlowLayout());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         janela = new Janela();
+        BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+            cursorImg, new Point(0, 0), "blank cursor");
+        janela.setCursor(blankCursor);
         add(janela);
         addMouseMotionListener(this);
         pack();
@@ -59,7 +59,11 @@ class airHockeyClient extends JFrame implements MouseMotionListener, Runnable {
     }
 
     public void run() {
-        initConnex();
+        try {
+            client = new ClientSocket();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Problema de conexão\n", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     static public void main(String[] args) {
